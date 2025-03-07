@@ -10,6 +10,7 @@ extern int colorSortBlue();
 
 extern int colorSortRedInAuton();
 
+extern int catchRedRing();
 
 extern int colorSortBlueInAuton();
 

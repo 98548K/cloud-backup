@@ -105,6 +105,7 @@ void autonomous(void) {
     }
     else {
         //task clampGoalInAuton = task (clampGoal);
+        task colorSortingBlue = task(colorSortBlueInAuton);
         skills_auton();
 
         //Inertial1.setHeading(0, deg);

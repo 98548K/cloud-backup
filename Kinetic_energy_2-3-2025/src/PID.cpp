@@ -75,8 +75,6 @@ class PID {
                     integral = 0;
                 }
 
-
-
                 derivative = error - prevError;
                 prevError = error;
                 pwr = error * p + integral * i + derivative * d;
@@ -94,7 +92,7 @@ class PID {
                     LeftDriveSmart.spin(fwd, pwr, pct);
                     RightDriveSmart.spin(fwd, pwr, pct);
                     if (error == 0) break;
-                    if (error >= -clawTolerance && error <= clawTolerance) break;
+                    if (error >= -driveTolerance && error <= driveTolerance) break;
                 }
 
 

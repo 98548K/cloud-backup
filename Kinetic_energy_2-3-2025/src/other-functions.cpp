@@ -24,6 +24,17 @@ int colorSortRed() {
 }
 
 
+int catchRedRing() {
+    while (true) {
+        if (ringOptical.hue() > 10 && ringOptical.hue() < 20) {
+            IntakesMotorB.stop();
+       }
+       else if (ringOptical.hue() > 10 && ringOptical.hue() < 20) {
+            IntakesMotorB.stop();
+       }
+        wait (10, msec);
+    }
+}
 
 
 int colorSortBlue() {
@@ -163,7 +174,7 @@ void auton_red_detected() {
 
 //Auton goal sensor
 void goal_detected() {
-    if (goalOptical.hue() > 45 && goalOptical.hue() < 85 && goalOptical.isNearObject() && limitSwitch.pressing()) {    
+    if (/*goalOptical.hue() > 45 && goalOptical.hue() < 85 && goalOptical.isNearObject() && */limitSwitch.pressing()) {    
             Clamp.set(false);
     }
 }
