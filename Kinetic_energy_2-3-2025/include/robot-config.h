@@ -9,7 +9,7 @@ extern motor IntakesMotorA;
 extern motor IntakesMotorB;
 extern motor Claw;
 extern optical ringOptical;
-extern optical goalOptical;
+//extern optical goalOptical;
 extern limit limitSwitch;
 extern digital_out Clamp;
 extern digital_out Teeth;

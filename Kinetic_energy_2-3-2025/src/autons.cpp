@@ -5,7 +5,7 @@ task clampGoalInAuton = task (clampGoal);
 task stopIntake = task(catchRedRing);
 
 void skills_auton(){
-    
+    Intakes.setVelocity(75, pct);
     stopIntake.suspend();
     clampGoalInAuton.resume();
     clawTracking.setPosition(40, deg);
@@ -20,7 +20,15 @@ void skills_auton(){
     Claw.spinFor(-900, deg, false);
     wait (.1, sec);
 
+    turnKP = 0.4;//0.5
+    turnKI = 0.0;//0.0
+    turnKD = 1.0;//1.0
+    turnTolerance = 0.4;
     turnToHeading(90);
+    turnTolerance = 0.6;
+    turnKP = 0.5;//0.5
+    turnKI = 0.0;//0.0
+    turnKD = 1.0;//1.0
     wait (.1, sec);
     Intakes.spin(fwd);
     driveIn(22);
@@ -34,7 +42,7 @@ void skills_auton(){
     turnToHeading(0);//maybe change this to 1
     wait (.1, sec);
     Claw.setVelocity(100, pct);
-    driveIn(16);
+    driveIn(13);
     wait (.1, sec);
     driveIn(-7);
     turnKP = 0.4;//0.5
@@ -73,11 +81,18 @@ void skills_auton(){
     Clamp.set(true);
     Intakes.spin(reverse);
     
-    driveIn(11);
+    driveIn(10);
 
-
-    turnToHeading(355);
-    Inertial1.setHeading(355, deg);
+    turnKP = 0.4;//0.5
+    turnKI = 0.0;//0.0
+    turnKD = 1.0;//1.0
+    turnTolerance = 0.4;
+    turnToHeading(4);
+    turnTolerance = 0.6;
+    turnKP = 0.5;//0.5
+    turnKI = 0.0;//0.0
+    turnKD = 1.0;//1.0
+    //
     Clamp.set(true);
     wait (.1, sec);
     clampGoalInAuton.suspend();
@@ -85,7 +100,7 @@ void skills_auton(){
     kP = 2.5;
     kI = 0.0;
     kD = 10.0;
-    driveIn(-72);
+    driveIn(-72.5);
     Clamp.set(false);
     kP = 3.9;//3.9
     kI = 3.5;//3.5
@@ -101,7 +116,7 @@ void skills_auton(){
     wait (.1, sec);
     turnToHeading(125);
     wait (.1, sec);
-    driveIn(34);
+    driveIn(35);
     wait (.1, sec);
     turnToHeading(180);
 
@@ -110,9 +125,17 @@ void skills_auton(){
     driveIn(8);
 
     wait (.1, sec);
-    driveIn(-15);
+    driveIn(-10);
     wait (.1, sec);
+
+    turnKP = 0.4;//0.5
+    turnKI = 0.0;//0.0
+    turnKD = 1.0;//1.0
     turnToHeading(270);
+    turnKP = 0.5;//0.5
+    turnKI = 0.0;//0.0
+    turnKD = 1.0;//1.0
+
     Intakes.spin(fwd);
     wait (.1, sec);
 
@@ -127,25 +150,25 @@ void skills_auton(){
     driveIn(-12);
     clampGoalInAuton.suspend();
     Clamp.set(true);
-    driveIn(10);
+    driveIn(11);
     turnToHeading(90);
     stopIntake.resume();
     //probably this
     Intakes.setVelocity(75, pct);
-    driveIn(68);
+    driveIn(70);
     Intakes.setVelocity(100, pct);
     
     wait (.1, sec);
     turnToHeading(0);
     //clampGoalInAuton.resume();
-    driveIn(30);
+    driveIn(26);
     wait (.1, sec);
     turnToHeading(270);
     wait (.1, sec);
     kP = 2.5;
     kI = 0.0;
     kD = 10.0;
-    driveIn(-30.5);
+    driveIn(-29);
     Clamp.set(false);
     kP = 3.9;//3.9
     kI = 3.5;//3.5
@@ -159,12 +182,12 @@ void skills_auton(){
     wait (.1, sec);
     driveIn(30);
     wait (.1, sec);
-    turnToHeading(165);
+    turnToHeading(180);
     //clampGoalInAuton.resume();
     kP = 2.5;
     kI = 0.0;
     kD = 9.0;
-    driveIn(-22);
+    driveIn(-26);
     Clamp.set(false);
     kP = 3.9;//3.9
     kI = 3.5;//3.5
@@ -175,7 +198,7 @@ void skills_auton(){
     driveIn(32);
     wait (.1, sec);
     turnToHeading(0);
-    driveIn(30);
+    driveIn(25);
     turnToHeading(90);
     wait (.1, sec);
     driveIn(15);
@@ -183,7 +206,7 @@ void skills_auton(){
     driveIn(-11);
     turnToHeading(65);
     wait (.1, sec);
-    driveIn(10);
+    driveIn(13);
     turnToHeading(245);
     clampGoalInAuton.suspend();
     Clamp.set(true);
@@ -196,7 +219,7 @@ void skills_auton(){
     kP = 2.5;
     kI = 0.0;
     kD = 5.0;
-    driveIn(-38);
+    driveIn(-55);
 }
 void Blue_4_ring(){
 
@@ -255,7 +278,7 @@ void Red_goal(){
     
 }
 void Other_red(){
-
+    
 }
 void Other_blue(){
 

@@ -4,7 +4,6 @@ bool clamped = false;
 bool chomped = false;
 bool doinked = false;
 const char * autoClampToggleSelection = "Off";
-double clawKP = 0.3;
 int clawTarget = 0;
 const char * colorSortColor = "Off ";
 
@@ -91,21 +90,23 @@ float clawError;
 
 void usercontrol(void) {
     Drivetrain.setStopping(coast);
-    //Drivetrain.setVelocity(100, pct);
-    //Intakes.setVelocity(100, pct);
+    Drivetrain.setDriveVelocity(100, pct);
+    Intakes.setVelocity(100, pct);
     clawTracking.setPosition(0, deg);
+    frontTracking.setPosition(0, deg);
+    sideTracking.setPosition(0, deg);
     LeftDriveSmart.setStopping(coast);
     RightDriveSmart.setStopping(coast);
     Claw.setVelocity(100, pct);
     ringOptical.setLightPower(100, pct);
-    goalOptical.setLightPower(100, pct);
+    //goalOptical.setLightPower(100, pct);
     Claw.setMaxTorque(100, pct);
 
 
     float clawPositions[3] = {
-        58,
+        48,
         10,
-        58,
+        48,
     };
 
 
@@ -113,33 +114,25 @@ void usercontrol(void) {
     task colorSortingBlue = task (colorSortBlue);
     task colorSortingRed = task (colorSortRed);
     task clampGoalViaOpticalSensor(clampGoal);
+    task stopIntake = task (catchRedRing);
 
     colorSortingBlue.suspend();
     colorSortingRed.suspend();
     clampGoalViaOpticalSensor.suspend();
+    stopIntake.suspend();
 
 
   while (1) {
     Drivetrain.setStopping(coast);
     LeftDriveSmart.setStopping(coast);
     RightDriveSmart.setStopping(coast);
-    //task clampGoalViaOpticalSensor(clampGoal);
 
     //Claw set code:
     targetAngle = clawPositions[clawTarget];
-    //clawError = targetAngle - clawTracking.angle(deg);
 
-    //red_detected();
 
     colorSort.set(false);
 
-    /*if (std::abs(clawError) >= 1) {
-        Claw.spin(fwd, clawError * clawKP, pct);
-    }
-    else {
-        Claw.stop(hold);
-    }*/
-    //
 
     //manual toggle and controls
     if (Controller1.ButtonR2.pressing()) {

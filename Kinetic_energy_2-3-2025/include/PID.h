@@ -29,10 +29,7 @@ extern bool isClaw;
 
 
 void driveIn(double driveDist);
-extern double startDist;
 
 void turnToHeading(double turnHeading);
-extern double currentHeading;
 
 void ClawRotate(double rotationValue);
-extern double currentRotation;

@@ -3,7 +3,7 @@
 
 void autonomous(void) {
     ringOptical.setLightPower(100, pct);
-    goalOptical.setLightPower(100, pct);
+    //goalOptical.setLightPower(100, pct);
     Drivetrain.setStopping(brake);
     frontTracking.setPosition(0, deg);
     task clampGoalViaOpticalSensor(clampGoal);
@@ -104,37 +104,11 @@ void autonomous(void) {
         Other_blue();
     }
     else {
-        //task clampGoalInAuton = task (clampGoal);
-        task colorSortingBlue = task(colorSortBlueInAuton);
-        skills_auton();
-
-        //Inertial1.setHeading(0, deg);
-        //wait (3, sec);
-
-        
-        //driveIn(-20);
-        //wait (.5, sec);
-        //turnKP = 0.5;//0.5
-        //turnKI = 0.0;//0.0
-        //turnKD = 1.0;//1.0
-        //driveIn(-22);
-        //turnToHeading(90);
-        //driveIn(22);
-        //turnToHeading(180);
-        //driveIn(20);
-
-        //clawTracking.setPosition(10, deg);
-        //ClawRotate(100);
-        //ClawRotate(10);
-
-        //Inertial1.calibrate();
-        //Inertial1.setHeading(0, deg);
-        //wait (3, sec);
-        //turnToHeading(180);
-        //Brain.programStop();
-        //driveIn(-24);
-        //wait (2, sec);
+        turnToHeading(180);
+        turnToHeading(0);
         //driveIn(24);
-        //Brain.programStop();
+        //driveIn(-24);
+
+        //driveToPosition(0, 60, fwd);
     }
 }
