@@ -1,5 +1,6 @@
 #include "vex.h"
 
+
 /*
 Kasens tuning tips (numerical order of tuning):
 
@@ -13,13 +14,18 @@ double clawKp = 0.7;//0.7
 double clawKi = 0.0;//0.0
 double clawKd = 0.0;//0.0
 
-double kP = 5.9999;//3.9
+double kP = 3.0;//3.7
 double kI = 0.0;//3.5
 double kD = 0.0;//0.4
 
 double turnKP = 0.61999982;//0.61999982
 double turnKI = 0.0000001;//0.0000001
 double turnKD = 3.2;//3.2
+
+double driveTurnKP = 1.0;
+double driveTurnKI = 0.0;
+double driveTurnKD = 0.0;
+
 double wheelRad = 1.0;//1.0
 
 double turnTolerance = 0.5;//0.0
@@ -29,13 +35,13 @@ double clawTolerance = 1.0;//0.0
 double driveIntegralLimit = 20.0;//20.0
 double turnIntegralLimit = 30.0;//30.0
 
-//Not nescessarry for PID but does account for drift. REMEMBER TO TUNE!
-double turnDifference = 10;
+//This is the rate difference that the more frictiony side of the drivetrain needs to catch up with the other side 
+double driveRate = 0.5;
 
 
 //Function for determining the turn direction. Credit to Caleb Carlson for making this function easy to find (https://www.vexforum.com/t/turning-with-pid-how-to-find-the-shortest-turn/110258/6)
 double constrainAngle(double x) {
-    //x = fmod(x + 180, 360);
+    x = fmod(x + 180, 360);
     if (x < 0)
         x += 360;
     return x - 180;
@@ -121,18 +127,16 @@ class PID {
                     pwr = error * kP + integral * kI + derivative * kD;
                     LeftDriveSmart.spin(fwd, pwr, pct);
                     RightDriveSmart.spin(fwd, pwr, pct);
+
+                    //This section accounts for drift using the inertial sensor.
+                    if ((constrainAngle(storedHeading - Inertial1.heading(deg)) >= turnTolerance)) {
+                        RightDriveSmart.spin(fwd, pwr + driveRate, pct);
+                    }
+                    else if ((constrainAngle(storedHeading - Inertial1.heading(deg)) <= -turnTolerance)) {
+                        LeftDriveSmart.spin(fwd, pwr + driveRate, pct);
+                    }
                     if (error == 0) break;
                     if (error >= -driveTolerance && error <= driveTolerance) break;
-
-                    //This section accounts for drift using the inertial sensor. It's pretty cool unless you have a very uneven amount of friction on the sides of your drivetrain, in which case you are screwed. probably
-                    if ((constrainAngle(storedHeading - Inertial1.heading(deg)) >= turnTolerance)) {
-                        RightDriveSmart.spin(fwd, pwr, pct);
-                        LeftDriveSmart.stop();
-                    }
-                    else if ((constrainAngle(storedHeading - Inertial1.heading(deg)) <= -turnTolerance * 8)) {
-                        LeftDriveSmart.spin(fwd, pwr, pct);
-                        RightDriveSmart.stop();
-                    }
                 }
 
                 //Class initialization for driving with odometry so it keeps track of the correct position of the tracking wheel only when it's only using odom
@@ -141,6 +145,13 @@ class PID {
                     pwr = error * kP + integral * kI + derivative * kD;
                     LeftDriveSmart.spin(fwd, pwr, pct);
                     RightDriveSmart.spin(fwd, pwr, pct);
+                    //This section accounts for drift using the inertial sensor.
+                    if ((constrainAngle(storedHeading - Inertial1.heading(deg)) >= turnTolerance)) {
+                        RightDriveSmart.spin(fwd, pwr + driveRate, pct);
+                    }
+                    else if ((constrainAngle(storedHeading - Inertial1.heading(deg)) <= -turnTolerance)) {
+                        LeftDriveSmart.spin(fwd, pwr + driveRate, pct);
+                    }
                     if (error == 0) break;
                     if (error >= -driveTolerance && error <= driveTolerance) break;
                 }
@@ -154,7 +165,7 @@ class PID {
                 }
 
                 //Terminates if within tolerance
-                if (error >= -driveTolerance && error <= driveTolerance) break;
+                if ((error >= -driveTolerance && error <= driveTolerance) || (Inertial1.heading(deg) > desiredValue - turnTolerance && Inertial1.heading(deg) < desiredValue + turnTolerance)) break;
                 if (error == 0) break;
                 wait (15, msec);
             }

@@ -141,7 +141,7 @@ int rc_auto_loop_function_Controller1() {
  * This should be called at the start of your int main function.
  */
 void vexcodeInit( void ) {
-  //task rc_auto_loop_task_Controller1(rc_auto_loop_function_Controller1);
+  task rc_auto_loop_task_Controller1(rc_auto_loop_function_Controller1);
   while (Inertial1.isCalibrating()) {
     Inertial1.setHeading(0, deg);
     setDrivePosition(0, 0, 0);
