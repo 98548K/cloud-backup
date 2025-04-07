@@ -14,17 +14,13 @@ double clawKp = 0.7;//0.7
 double clawKi = 0.0;//0.0
 double clawKd = 0.0;//0.0
 
-double kP = 3.0;//3.7
+double kP = 5.8;//3.7
 double kI = 0.0;//3.5
 double kD = 0.0;//0.4
 
 double turnKP = 0.61999982;//0.61999982
 double turnKI = 0.0000001;//0.0000001
 double turnKD = 3.2;//3.2
-
-double driveTurnKP = 1.0;
-double driveTurnKI = 0.0;
-double driveTurnKD = 0.0;
 
 double wheelRad = 1.0;//1.0
 
@@ -35,8 +31,6 @@ double clawTolerance = 1.0;//0.0
 double driveIntegralLimit = 20.0;//20.0
 double turnIntegralLimit = 30.0;//30.0
 
-//This is the rate difference that the more frictiony side of the drivetrain needs to catch up with the other side 
-double driveRate = 0.5;
 
 
 //Function for determining the turn direction. Credit to Caleb Carlson for making this function easy to find (https://www.vexforum.com/t/turning-with-pid-how-to-find-the-shortest-turn/110258/6)
@@ -55,9 +49,12 @@ class PID {
         //Declaring sensor math variables
         double desiredValue;
         double error;
+        double frictionError;
+        double turnDifference;
         double integral = 0;
         double derivative;
         double pwr;
+        double frictionPwr;
         double prevError;
         double storedTrackingMeasurements;
         double storedHeading;
@@ -88,6 +85,9 @@ class PID {
             while (true) {
                 //This simmulates drive PID starting at 0
                 resetCurrentPosition = frontTracking.position(turns) - storedTrackingMeasurements;
+                //Change this to whatever the less frictiony side of the drivetrain is
+                RightDriveSmart.setPosition(frontTracking.position(turns), turns);
+
                 //This is nescessarry for odometry to work so we don't have to reset the forward/sideways tracking position.
                 //It instead starts where the tracking position is to 0 allowing it to use distance values instead of coordinate values
 
@@ -125,18 +125,16 @@ class PID {
                     //This section is just drive PID
                     error = desiredValue - resetCurrentPosition * (wheelRad * 2) * M_PI;
                     pwr = error * kP + integral * kI + derivative * kD;
-                    LeftDriveSmart.spin(fwd, pwr, pct);
+                    LeftDriveSmart.spin(fwd, frictionPwr, pct);
                     RightDriveSmart.spin(fwd, pwr, pct);
-
-                    //This section accounts for drift using the inertial sensor.
-                    if ((constrainAngle(storedHeading - Inertial1.heading(deg)) >= turnTolerance)) {
-                        RightDriveSmart.spin(fwd, pwr + driveRate, pct);
-                    }
-                    else if ((constrainAngle(storedHeading - Inertial1.heading(deg)) <= -turnTolerance)) {
-                        LeftDriveSmart.spin(fwd, pwr + driveRate, pct);
-                    }
                     if (error == 0) break;
                     if (error >= -driveTolerance && error <= driveTolerance) break;
+
+                    //Change this stuff depending on which side is more frictiony
+                    frictionPwr = frictionError * kP + integral * kI + derivative * kD;
+                    frictionError += turnDifference;
+                    turnDifference = 2 * (((horizontalTrackingCenter * 2) / radianHeading) * (sin(radianHeading / 2)));
+                    std::cout << turnDifference << std::endl;
                 }
 
                 //Class initialization for driving with odometry so it keeps track of the correct position of the tracking wheel only when it's only using odom
@@ -145,13 +143,6 @@ class PID {
                     pwr = error * kP + integral * kI + derivative * kD;
                     LeftDriveSmart.spin(fwd, pwr, pct);
                     RightDriveSmart.spin(fwd, pwr, pct);
-                    //This section accounts for drift using the inertial sensor.
-                    if ((constrainAngle(storedHeading - Inertial1.heading(deg)) >= turnTolerance)) {
-                        RightDriveSmart.spin(fwd, pwr + driveRate, pct);
-                    }
-                    else if ((constrainAngle(storedHeading - Inertial1.heading(deg)) <= -turnTolerance)) {
-                        LeftDriveSmart.spin(fwd, pwr + driveRate, pct);
-                    }
                     if (error == 0) break;
                     if (error >= -driveTolerance && error <= driveTolerance) break;
                 }
@@ -196,6 +187,6 @@ void ClawRotate(double rotationValue) {
 
 //Drive PID function for odometry use so that it doesn't mess with encoder readings
 void driveInOdom(double driveDist) {
-    PID odomDrivePID(driveDist, true, false, false, false);
+    PID odomDrivePID(driveDist, false, false, false, true);
     odomDrivePID.run();
 }

@@ -10,7 +10,7 @@ extern double turnKD;
 extern double wheelRad;
 extern double tolerance;
 extern double turnTolerance;
-
+extern double turnDifference;
 
 
 extern double p, i, d;

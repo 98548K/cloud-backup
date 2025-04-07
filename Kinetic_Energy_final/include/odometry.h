@@ -3,6 +3,8 @@ extern double SIDE_WHEEL;
 extern double X;
 extern double Y;
 extern double radianHeading;
+extern const double horizontalTrackingCenter;
+extern const double verticalTrackingCenter;
 extern int positionTracking();
 void setDrivePosition(double x, double y, double startHeading);
 void turnToPosition(double x, double y, vex::directionType dir);

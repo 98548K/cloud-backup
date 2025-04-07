@@ -100,7 +100,7 @@ int positionTracking() {
         prevFRONT_WHEEL = FRONT_WHEEL;
         prevSIDE_WHEEL = SIDE_WHEEL;
 
-        std::cout << "X: " << X << "   Y: " << Y << std::endl;
+        //std::cout << "X: " << X << "   Y: " << Y << std::endl;
         //wait (25, msec);
         task::sleep(10);
     }
