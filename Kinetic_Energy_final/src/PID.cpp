@@ -50,6 +50,7 @@ class PID {
         double desiredValue;
         double error;
         double frictionError;
+        double frictionUpdate;
         double turnDifference;
         double integral = 0;
         double derivative;
@@ -57,6 +58,7 @@ class PID {
         double frictionPwr;
         double prevError;
         double storedTrackingMeasurements;
+        double storedFrictionTracking;
         double storedHeading;
         double resetCurrentPosition;
         //Declaring what instance of motor control it is
@@ -81,12 +83,14 @@ class PID {
             error = 0;
             //This accounts for the tracking wheel measuremants in PID
             storedTrackingMeasurements = frontTracking.position(turns);
+            storedFrictionTracking = LeftDriveSmart.position(turns);
             storedHeading = Inertial1.heading(deg);
             while (true) {
                 //This simmulates drive PID starting at 0
                 resetCurrentPosition = frontTracking.position(turns) - storedTrackingMeasurements;
                 //Change this to whatever the less frictiony side of the drivetrain is
                 RightDriveSmart.setPosition(frontTracking.position(turns), turns);
+                frictionUpdate = LeftDriveSmart.position(turns) - storedFrictionTracking;
 
                 //This is nescessarry for odometry to work so we don't have to reset the forward/sideways tracking position.
                 //It instead starts where the tracking position is to 0 allowing it to use distance values instead of coordinate values
@@ -124,6 +128,7 @@ class PID {
                 else if (isDriving) {
                     //This section is just drive PID
                     error = desiredValue - resetCurrentPosition * (wheelRad * 2) * M_PI;
+                    frictionError = desiredValue - frictionUpdate * (wheelRad * 2) * M_PI;
                     pwr = error * kP + integral * kI + derivative * kD;
                     LeftDriveSmart.spin(fwd, frictionPwr, pct);
                     RightDriveSmart.spin(fwd, pwr, pct);
@@ -134,6 +139,7 @@ class PID {
                     frictionPwr = frictionError * kP + integral * kI + derivative * kD;
                     frictionError += turnDifference;
                     turnDifference = 2 * (((horizontalTrackingCenter * 2) / radianHeading) * (sin(radianHeading / 2)));
+                    //prints
                     std::cout << turnDifference << std::endl;
                 }
 
