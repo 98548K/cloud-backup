@@ -31,3 +31,5 @@ void turnToHeading(double turnHeading);
 void ClawRotate(double rotationValue);
 
 void driveInOdom(double driveDist);
+
+void driveInLessDrift(double driveDist);

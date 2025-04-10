@@ -4,9 +4,9 @@
 /*
 Kasens tuning tips (numerical order of tuning):
 
-1. kP values = make it as high as possible without it becoming unstable. Tune it until it has oscillated for two rounds
+1. kP values = make it as high as possible without it becoming unstable. Tune it until it has oscillated or goes back and forth for two rounds.
 3. kI values = make it as high as possible without it becoming unstable. If it messes up you have the wrong value. Thats the best advice I can give.
-2. kD values = make it as low as possible without it becoming unstable. Have it ramp itself down and try to do it without the abrupt stops and without any hint of oscillation
+2. kD values = make it as low as possible without it becoming unstable. Have it ramp itself down and try to do it without the abrupt stops and without any hint of oscillation or going back and forth.
 */
 
 
@@ -14,15 +14,17 @@ double clawKp = 0.7;//0.7
 double clawKi = 0.0;//0.0
 double clawKd = 0.0;//0.0
 
-double kP = 5.8;//3.7
-double kI = 0.0;//3.5
-double kD = 0.0;//0.4
+//I know this might seem impractical but it makes a difference
+double kP = 5.0;//4.3
+double kI = 0.0;//0.0
+double kD = 0.0;//0.0
 
 double turnKP = 0.61999982;//0.61999982
 double turnKI = 0.0000001;//0.0000001
 double turnKD = 3.2;//3.2
 
 double wheelRad = 1.0;//1.0
+double drivetrainWheelRad = 2.0;//2.0
 
 double turnTolerance = 0.5;//0.0
 double driveTolerance = 0.0;//0.0
@@ -30,6 +32,8 @@ double clawTolerance = 1.0;//0.0
 
 double driveIntegralLimit = 20.0;//20.0
 double turnIntegralLimit = 30.0;//30.0
+
+double drivetrainDiameter = 13;
 
 
 
@@ -49,16 +53,11 @@ class PID {
         //Declaring sensor math variables
         double desiredValue;
         double error;
-        double frictionError;
-        double frictionUpdate;
-        double turnDifference;
         double integral = 0;
         double derivative;
         double pwr;
-        double frictionPwr;
         double prevError;
         double storedTrackingMeasurements;
-        double storedFrictionTracking;
         double storedHeading;
         double resetCurrentPosition;
         //Declaring what instance of motor control it is
@@ -66,7 +65,6 @@ class PID {
         bool isDriving;
         bool isClaw;
         bool isOdomDrive;
-
     //PID class parameter setup
     public:
         PID(double DesiredValue, bool IsDriving, bool IsTurning, bool IsClaw, bool IsOdomDrive) {
@@ -83,14 +81,11 @@ class PID {
             error = 0;
             //This accounts for the tracking wheel measuremants in PID
             storedTrackingMeasurements = frontTracking.position(turns);
-            storedFrictionTracking = LeftDriveSmart.position(turns);
+
             storedHeading = Inertial1.heading(deg);
             while (true) {
                 //This simmulates drive PID starting at 0
                 resetCurrentPosition = frontTracking.position(turns) - storedTrackingMeasurements;
-                //Change this to whatever the less frictiony side of the drivetrain is
-                RightDriveSmart.setPosition(frontTracking.position(turns), turns);
-                frictionUpdate = LeftDriveSmart.position(turns) - storedFrictionTracking;
 
                 //This is nescessarry for odometry to work so we don't have to reset the forward/sideways tracking position.
                 //It instead starts where the tracking position is to 0 allowing it to use distance values instead of coordinate values
@@ -128,19 +123,11 @@ class PID {
                 else if (isDriving) {
                     //This section is just drive PID
                     error = desiredValue - resetCurrentPosition * (wheelRad * 2) * M_PI;
-                    frictionError = desiredValue - frictionUpdate * (wheelRad * 2) * M_PI;
                     pwr = error * kP + integral * kI + derivative * kD;
-                    LeftDriveSmart.spin(fwd, frictionPwr, pct);
+                    LeftDriveSmart.spin(fwd, pwr, pct);
                     RightDriveSmart.spin(fwd, pwr, pct);
                     if (error == 0) break;
                     if (error >= -driveTolerance && error <= driveTolerance) break;
-
-                    //Change this stuff depending on which side is more frictiony
-                    frictionPwr = frictionError * kP + integral * kI + derivative * kD;
-                    frictionError += turnDifference;
-                    turnDifference = 2 * (((horizontalTrackingCenter * 2) / radianHeading) * (sin(radianHeading / 2)));
-                    //prints
-                    std::cout << turnDifference << std::endl;
                 }
 
                 //Class initialization for driving with odometry so it keeps track of the correct position of the tracking wheel only when it's only using odom
