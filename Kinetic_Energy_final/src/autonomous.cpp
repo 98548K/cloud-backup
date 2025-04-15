@@ -67,10 +67,10 @@ void autonomous(void) {
         //wait (1, sec);
         //turnToHeading(0);
 
-        driveIn(24);
-        turnToHeading(0);
+        //driveIn(24);
+        turnToHeading(90);
         wait (1, sec);
-        driveIn(-24);
+        //driveIn(-24);
         turnToHeading(0);
 
         //driveToPosition(24, 24, fwd);

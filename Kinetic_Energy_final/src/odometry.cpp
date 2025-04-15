@@ -56,8 +56,8 @@ int positionTracking() {
         deltaSIDE_WHEEL = SIDE_WHEEL - prevSIDE_WHEEL;
 
         //Arc math for determining the robots current side distance from the simulated circle center
-        arcRadius = deltaFRONT_WHEEL / radianHeading;
         radianHeading = Inertial1.heading(deg) * M_PI / 180;
+        arcRadius = deltaFRONT_WHEEL / radianHeading;
         arcLength = arcRadius * radianHeading + horizontalTrackingCenter;
         deltaArcLength = arcRadius * radianHeading + horizontalTrackingCenter;
         deltaRadianHeading = radianHeading - prevRadianHeading;
@@ -107,7 +107,7 @@ int positionTracking() {
     return 0;
 }
 
-//Function for calculating the distance from both axes. First two parameters are where it's at, second parameters are where it needs to be
+//Function for calculating the distance from both axes. First two parameters are where it's at, second parameters are where it needs to be. Credit to Kassidy Mickelson
 
 /*
 Square the difference between the x values.

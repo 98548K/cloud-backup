@@ -84,6 +84,7 @@ void usercontrol(void) {
     Claw.setVelocity(100, pct);
     ringOptical.setLightPower(100, pct);
     Claw.setMaxTorque(100, pct);
+    Claw.setPosition(10, deg);
 
 
     float clawPositions[3] = {

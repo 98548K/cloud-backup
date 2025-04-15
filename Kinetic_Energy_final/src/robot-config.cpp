@@ -25,12 +25,12 @@ motor_group RightDriveSmart = motor_group(RF, RM, RB);
 inertial Inertial1 = inertial(PORT10);
 drivetrain Drivetrain = drivetrain(LeftDriveSmart, RightDriveSmart, 299.24, 320, 40, mm, 0.75);
 motor IntakesMotorA = motor(PORT8, ratio18_1, true);
-motor IntakesMotorB = motor(PORT13, ratio18_1, true);
+motor IntakesMotorB = motor(PORT19, ratio18_1, true);
 motor_group Intakes = motor_group(IntakesMotorA, IntakesMotorB);
 motor Claw = motor(PORT12, ratio18_1, false);
 
 
-optical ringOptical = optical(PORT19);
+optical ringOptical = optical(PORT1);
 //optical goalOptical = optical(PORT8);
 
 

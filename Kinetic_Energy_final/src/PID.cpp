@@ -14,19 +14,18 @@ double clawKp = 0.7;//0.7
 double clawKi = 0.0;//0.0
 double clawKd = 0.0;//0.0
 
-//I know this might seem impractical but it makes a difference
-double kP = 5.0;//4.3
+double kP = 4.3;//4.3
 double kI = 0.0;//0.0
 double kD = 0.0;//0.0
 
-double turnKP = 0.61999982;//0.61999982
-double turnKI = 0.0000001;//0.0000001
-double turnKD = 3.2;//3.2
+double turnKP = 0.692695;//0.61999982
+double turnKI = 0.0;//0.0000001
+double turnKD = 0.0;//3.2
 
 double wheelRad = 1.0;//1.0
 double drivetrainWheelRad = 2.0;//2.0
 
-double turnTolerance = 0.5;//0.0
+double turnTolerance = 0.0;//0.0
 double driveTolerance = 0.0;//0.0
 double clawTolerance = 1.0;//0.0
 
@@ -53,13 +52,14 @@ class PID {
         //Declaring sensor math variables
         double desiredValue;
         double error;
-        double integral = 0;
+        double integral;
         double derivative;
         double pwr;
         double prevError;
         double storedTrackingMeasurements;
         double storedHeading;
         double resetCurrentPosition;
+        double turnDifference;
         //Declaring what instance of motor control it is
         bool isTurning;
         bool isDriving;
@@ -109,14 +109,19 @@ class PID {
                 prevError = error;
                 //
 
+                //Turn difference calculations for determing the distance between the left and right sides of the drivetrain
+                turnDifference = 2 * ((drivetrainDiameter / 2) * radianHeading) * (sin(radianHeading / 2));
+
                 
+
                 //Class initialization for turning
                 if (isTurning) {
                     error = constrainAngle(desiredValue - Inertial1.heading(deg));
                     pwr = error * turnKP + integral * turnKI + derivative * turnKD;
                     LeftDriveSmart.spin(fwd, pwr, pct);
                     RightDriveSmart.spin(reverse, pwr, pct);
-                    if (Inertial1.heading(deg) > desiredValue - turnTolerance && Inertial1.heading(deg) < desiredValue + turnTolerance) break;
+                    if (error == 0) break;
+                    if (error >= -turnTolerance && error <= turnTolerance);
                 }
 
                 //Class initialization for driving
@@ -124,18 +129,34 @@ class PID {
                     //This section is just drive PID
                     error = desiredValue - resetCurrentPosition * (wheelRad * 2) * M_PI;
                     pwr = error * kP + integral * kI + derivative * kD;
-                    LeftDriveSmart.spin(fwd, pwr, pct);
-                    RightDriveSmart.spin(fwd, pwr, pct);
+                    if (constrainAngle(storedHeading - Inertial1.heading(deg)) < 0) {
+                        RightDriveSmart.spin(fwd, pwr--, pct);
+                        LeftDriveSmart.spin(fwd, pwr++, pct);
+                    }
+                    else if (constrainAngle(storedHeading - Inertial1.heading(deg)) > 0) {
+                        RightDriveSmart.spin(fwd, pwr++, pct);
+                        LeftDriveSmart.spin(fwd, pwr--, pct);
+                    }
                     if (error == 0) break;
                     if (error >= -driveTolerance && error <= driveTolerance) break;
                 }
+
+                //If it messes up the acceleration or measurement values use this
+                //LeftDriveSmart.spin(fwd, pwr, pct);
+                //RightDriveSmart.spin(fwd, pwr, pct);
 
                 //Class initialization for driving with odometry so it keeps track of the correct position of the tracking wheel only when it's only using odom
                 else if (isOdomDrive) {
                     error = desiredValue - frontTracking.position(turns) * (wheelRad * 2) * M_PI;
                     pwr = error * kP + integral * kI + derivative * kD;
-                    LeftDriveSmart.spin(fwd, pwr, pct);
-                    RightDriveSmart.spin(fwd, pwr, pct);
+                    if (constrainAngle(storedHeading - Inertial1.heading(deg)) < 0) {
+                        RightDriveSmart.spin(fwd, pwr--, pct);
+                        LeftDriveSmart.spin(fwd, pwr++, pct);
+                    }
+                    else if (constrainAngle(storedHeading - Inertial1.heading(deg)) > 0) {
+                        RightDriveSmart.spin(fwd, pwr++, pct);
+                        LeftDriveSmart.spin(fwd, pwr--, pct);
+                    }
                     if (error == 0) break;
                     if (error >= -driveTolerance && error <= driveTolerance) break;
                 }
@@ -143,13 +164,14 @@ class PID {
                 //Class initialization for claw
                 else if (isClaw) {
                     error = desiredValue - clawTracking.position(deg);
+                    pwr = error * clawKp + integral * clawKi + derivative * clawKd;
                     Claw.spin(fwd, pwr, pct);
                     if (error == 0) break;
                     if (error >= -clawTolerance && error <= clawTolerance) break;
                 }
 
                 //Terminates if within tolerance
-                if ((error >= -driveTolerance && error <= driveTolerance) || (Inertial1.heading(deg) > desiredValue - turnTolerance && Inertial1.heading(deg) < desiredValue + turnTolerance)) break;
+                if ((error >= -driveTolerance && error <= driveTolerance && (isDriving || isOdomDrive)) || (error <= turnTolerance && error >= -turnTolerance && isTurning) || (error >= -clawTolerance && error <= clawTolerance && (isClaw))) break;
                 if (error == 0) break;
                 wait (15, msec);
             }
