@@ -14,19 +14,19 @@ double clawKp = 0.7;//0.7
 double clawKi = 0.0;//0.0
 double clawKd = 0.0;//0.0
 
-double kP = 4.3;//4.3
-double kI = 0.0;//0.0
-double kD = 0.0;//0.0
+double kP = 4.57999999;//4.3
+double kI = 1.0;//0.0
+double kD = 16.52849199;//0.0
 
-double turnKP = 0.692695;//0.61999982
-double turnKI = 0.0;//0.0000001
-double turnKD = 0.0;//3.2
+double turnKP = 0.50999999;//0.50999999
+double turnKI = 0.000000000001;//0.000000000001
+double turnKD = 1.26999994;//1.26999994
 
 double wheelRad = 1.0;//1.0
 double drivetrainWheelRad = 2.0;//2.0
 
-double turnTolerance = 0.0;//0.0
-double driveTolerance = 0.0;//0.0
+double turnTolerance = 0.2;//0.1
+double driveTolerance = 0.1;//0.0
 double clawTolerance = 1.0;//0.0
 
 double driveIntegralLimit = 20.0;//20.0

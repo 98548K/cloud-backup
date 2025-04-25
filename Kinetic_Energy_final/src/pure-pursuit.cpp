@@ -1,10 +1,14 @@
-#include "vex.h"
+/*#include "vex.h"
 
-//Path list initialization
-double pathCoords[1] = {7};
+double path[] = {1, 2, 3, 4, 5, true};
 
-//PID math variables in case of PID implementation
-
+int len() {
+    int length = 0;
+    while (path[length + 1] != true) {
+        length += 1;
+    }
+    return length;
+}
 
 int purePursuitPath() {
     while (true) {
@@ -12,5 +16,7 @@ int purePursuitPath() {
         integral += error;
         derivative = error - prevError;
         pwr = error * kP + integral * kI + derivative * kD;
+
+        return std::cout << len() << std::endl;
     }
-}
+}*/

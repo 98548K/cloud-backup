@@ -88,9 +88,9 @@ void usercontrol(void) {
 
 
     float clawPositions[3] = {
-        46,
+        27,
         10,
-        46,
+        27,
     };
 
 

@@ -10,42 +10,42 @@ brain  Brain;
 controller Controller1 = controller(primary);
 
 
-motor LF = motor(PORT7, ratio6_1, true);
-motor LM = motor(PORT3, ratio6_1, true);
+motor LF = motor(PORT19, ratio6_1, true);
+motor LM = motor(PORT7, ratio6_1, true);
 motor LB = motor(PORT15, ratio6_1, true);
 motor_group LeftDriveSmart = motor_group(LF, LM, LB);
-motor RF = motor(PORT5, ratio6_1, false);
-motor RM = motor(PORT2, ratio6_1, false);
-motor RB = motor(PORT4, ratio6_1, false);
+motor RF = motor(PORT8, ratio6_1, false);
+motor RM = motor(PORT4, ratio6_1, false);
+motor RB = motor(PORT5, ratio6_1, false);
 motor_group RightDriveSmart = motor_group(RF, RM, RB);
 
 
 
 
-inertial Inertial1 = inertial(PORT10);
+inertial Inertial1 = inertial(PORT12);
 drivetrain Drivetrain = drivetrain(LeftDriveSmart, RightDriveSmart, 299.24, 320, 40, mm, 0.75);
-motor IntakesMotorA = motor(PORT8, ratio18_1, true);
-motor IntakesMotorB = motor(PORT19, ratio18_1, true);
+motor IntakesMotorA = motor(PORT6, ratio18_1, true);
+motor IntakesMotorB = motor(PORT18, ratio18_1, true);
 motor_group Intakes = motor_group(IntakesMotorA, IntakesMotorB);
-motor Claw = motor(PORT12, ratio18_1, false);
+motor Claw = motor(PORT14, ratio18_1, false);
 
 
 optical ringOptical = optical(PORT1);
 //optical goalOptical = optical(PORT8);
 
 
-limit limitSwitch = limit(Brain.ThreeWirePort.B);
+limit limitSwitch = limit(Brain.ThreeWirePort.G);
 
 
-digital_out Clamp = digital_out(Brain.ThreeWirePort.H);
-digital_out Teeth = digital_out(Brain.ThreeWirePort.G);
-digital_out Doinker = digital_out(Brain.ThreeWirePort.F);
-digital_out colorSort = digital_out(Brain.ThreeWirePort.A);
+digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
+digital_out Teeth = digital_out(Brain.ThreeWirePort.C);
+digital_out Doinker = digital_out(Brain.ThreeWirePort.B);
+digital_out colorSort = digital_out(Brain.ThreeWirePort.G);
 
 
-rotation frontTracking = rotation(PORT14, true);
+rotation frontTracking = rotation(PORT16, true);
 rotation sideTracking = rotation(PORT20, false);
-rotation clawTracking = rotation(PORT11, false);
+rotation clawTracking = rotation(PORT13, false);
 
 
 bool RemoteControlCodeEnabled = true;
@@ -143,8 +143,8 @@ int rc_auto_loop_function_Controller1() {
 void vexcodeInit( void ) {
   task rc_auto_loop_task_Controller1(rc_auto_loop_function_Controller1);
   while (Inertial1.isCalibrating()) {
-    Inertial1.setHeading(0, deg);
-    setDrivePosition(0, 0, 0);
+    //Inertial1.setHeading(0, deg);
+    //setDrivePosition(0, 0, 270);
     wait (25, msec);
   }
 }

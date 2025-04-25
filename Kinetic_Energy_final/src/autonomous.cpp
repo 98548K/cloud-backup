@@ -36,7 +36,7 @@ void autonomous(void) {
         
     }
     else if (auton == "Red 5 ring") {
-        
+        Red_5_Ring();
     }
     else if (auton == "Rsig win pt") {
         
@@ -68,15 +68,16 @@ void autonomous(void) {
         //turnToHeading(0);
 
         //driveIn(24);
-        turnToHeading(90);
-        wait (1, sec);
+        //turnToHeading(90);
+        //wait (1, sec);
         //driveIn(-24);
-        turnToHeading(0);
+        //turnToHeading(0);
 
         //driveToPosition(24, 24, fwd);
         //wait (1, sec);
         //driveToPosition(0, 0, reverse);
         //wait (1, sec);
         //driveToPosition(24, 24, fwd);
+        Red_5_Ring();
     }
 }
