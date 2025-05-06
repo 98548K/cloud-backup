@@ -24,7 +24,7 @@ motor_group RightDriveSmart = motor_group(RF, RM, RB);
 
 inertial Inertial1 = inertial(PORT12);
 drivetrain Drivetrain = drivetrain(LeftDriveSmart, RightDriveSmart, 299.24, 320, 40, mm, 0.75);
-motor IntakesMotorA = motor(PORT6, ratio18_1, true);
+motor IntakesMotorA = motor(PORT17, ratio18_1, true);
 motor IntakesMotorB = motor(PORT18, ratio18_1, true);
 motor_group Intakes = motor_group(IntakesMotorA, IntakesMotorB);
 motor Claw = motor(PORT14, ratio18_1, false);
@@ -144,7 +144,7 @@ void vexcodeInit( void ) {
   task rc_auto_loop_task_Controller1(rc_auto_loop_function_Controller1);
   while (Inertial1.isCalibrating()) {
     //Inertial1.setHeading(0, deg);
-    //setDrivePosition(0, 0, 270);
+    //setDrivePosition(0, 0, 0);
     wait (25, msec);
   }
 }

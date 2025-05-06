@@ -14,9 +14,13 @@ double clawKp = 0.7;//0.7
 double clawKi = 0.0;//0.0
 double clawKd = 0.0;//0.0
 
-double kP = 4.57999999;//4.3
-double kI = 1.0;//0.0
-double kD = 16.52849199;//0.0
+double kP = 1.57999999;//1.57999999
+double kI = 0.05;//0.05
+double kD = 8.99999999;//8.99999999
+
+double slowKP = 0.0005;//0.0
+double slowKI = 0.1;//0.0
+double slowKD = 18.0;//0.0
 
 double turnKP = 0.50999999;//0.50999999
 double turnKI = 0.000000000001;//0.000000000001
@@ -25,14 +29,14 @@ double turnKD = 1.26999994;//1.26999994
 double wheelRad = 1.0;//1.0
 double drivetrainWheelRad = 2.0;//2.0
 
-double turnTolerance = 0.2;//0.1
-double driveTolerance = 0.1;//0.0
+double turnTolerance = 0.3;//0.1
+double driveTolerance = 0.2;//0.0
 double clawTolerance = 1.0;//0.0
 
-double driveIntegralLimit = 20.0;//20.0
+double driveIntegralLimit = 10.0;//20.0
 double turnIntegralLimit = 30.0;//30.0
 
-double drivetrainDiameter = 13;
+double drivetrainWidth = 13;
 
 
 
@@ -65,15 +69,19 @@ class PID {
         bool isDriving;
         bool isClaw;
         bool isOdomDrive;
+        bool isSlowDriving;
+        bool isSlowOdomDrive;
     //PID class parameter setup
     public:
-        PID(double DesiredValue, bool IsDriving, bool IsTurning, bool IsClaw, bool IsOdomDrive) {
+        PID(double DesiredValue, bool IsDriving, bool IsTurning, bool IsClaw, bool IsOdomDrive, bool IsSlowOdomDrive, bool IsSlowDriving) {
             desiredValue = DesiredValue;
             error = DesiredValue;
             isTurning = IsTurning;
             isDriving = IsDriving;
             isClaw = IsClaw;
             isOdomDrive = IsOdomDrive;
+            isSlowOdomDrive = IsSlowOdomDrive;
+            isSlowDriving = IsSlowDriving;
         }
 
         void run() {
@@ -100,7 +108,7 @@ class PID {
                 }
                 if (std::abs(error) < turnIntegralLimit && isTurning) {
                     integral = 0;
-                } else if (std::abs(error) < driveIntegralLimit && !isTurning) {
+                } else if (std::abs(error) < driveIntegralLimit && (isDriving || isOdomDrive)) {
                     integral = 0;
                 }
 
@@ -110,7 +118,7 @@ class PID {
                 //
 
                 //Turn difference calculations for determing the distance between the left and right sides of the drivetrain
-                turnDifference = 2 * ((drivetrainDiameter / 2) * radianHeading) * (sin(radianHeading / 2));
+                turnDifference = 2 * ((drivetrainWidth / 2) * radianHeading) * (sin(radianHeading / 2));
 
                 
 
@@ -121,7 +129,7 @@ class PID {
                     LeftDriveSmart.spin(fwd, pwr, pct);
                     RightDriveSmart.spin(reverse, pwr, pct);
                     if (error == 0) break;
-                    if (error >= -turnTolerance && error <= turnTolerance);
+                    if (error >= -turnTolerance && error <= turnTolerance) break;
                 }
 
                 //Class initialization for driving
@@ -170,6 +178,37 @@ class PID {
                     if (error >= -clawTolerance && error <= clawTolerance) break;
                 }
 
+                else if (isSlowOdomDrive) {
+                    error = desiredValue - frontTracking.position(turns) * (wheelRad * 2) * M_PI;
+                    pwr = error * slowKP + integral * slowKI + derivative * slowKD;
+                    if (constrainAngle(storedHeading - Inertial1.heading(deg)) < 0) {
+                        RightDriveSmart.spin(fwd, pwr--, pct);
+                        LeftDriveSmart.spin(fwd, pwr++, pct);
+                    }
+                    else if (constrainAngle(storedHeading - Inertial1.heading(deg)) > 0) {
+                        RightDriveSmart.spin(fwd, pwr++, pct);
+                        LeftDriveSmart.spin(fwd, pwr--, pct);
+                    }
+                    if (error == 0) break;
+                    if (error >= -driveTolerance && error <= driveTolerance) break;
+                }
+
+                else if (isSlowDriving) {
+                    //This section is just slow drive PID
+                    error = desiredValue - resetCurrentPosition * (wheelRad * 2) * M_PI;
+                    pwr = error * slowKP + integral * slowKI + derivative * slowKD;
+                    if (constrainAngle(storedHeading - Inertial1.heading(deg)) < 0) {
+                        RightDriveSmart.spin(fwd, pwr--, pct);
+                        LeftDriveSmart.spin(fwd, pwr++, pct);
+                    }
+                    else if (constrainAngle(storedHeading - Inertial1.heading(deg)) > 0) {
+                        RightDriveSmart.spin(fwd, pwr++, pct);
+                        LeftDriveSmart.spin(fwd, pwr--, pct);
+                    }
+                    if (error == 0) break;
+                    if (error >= -driveTolerance && error <= driveTolerance) break;
+                }
+
                 //Terminates if within tolerance
                 if ((error >= -driveTolerance && error <= driveTolerance && (isDriving || isOdomDrive)) || (error <= turnTolerance && error >= -turnTolerance && isTurning) || (error >= -clawTolerance && error <= clawTolerance && (isClaw))) break;
                 if (error == 0) break;
@@ -183,25 +222,36 @@ class PID {
 
 //Drive PID function
 void driveIn(double driveDist) {
-    double startHeading = Inertial1.heading(deg);
-    PID drivePID(driveDist, true, false, false, false);
+    PID drivePID(driveDist, true, false, false, false, false, false);
     drivePID.run();
 }
 
 //Turn PID function
 void turnToHeading(double turnHeading) {
-    PID turnPID(turnHeading, false, true, false, false);
+    PID turnPID(turnHeading, false, true, false, false, false, false);
     turnPID.run();
 }
 
 //Claw PID function
 void ClawRotate(double rotationValue) {
-    PID clawPID(rotationValue, false, false, true, false);
+    PID clawPID(rotationValue, false, false, true, false, false, false);
     clawPID.run();
 }
 
 //Drive PID function for odometry use so that it doesn't mess with encoder readings
 void driveInOdom(double driveDist) {
-    PID odomDrivePID(driveDist, false, false, false, true);
+    PID odomDrivePID(driveDist, false, false, false, true, false, false);
     odomDrivePID.run();
+}
+
+//Slow odometry PID
+void slowDriveOdom(double driveDist) {
+    PID odomDrivePID(driveDist, false, false, false, true, true, false);
+    odomDrivePID.run();
+}
+
+//Slow drive PID
+void slowDrive(double driveDist) {
+    PID drivePID(driveDist, false, false, false, true, false, true);
+    drivePID.run();
 }

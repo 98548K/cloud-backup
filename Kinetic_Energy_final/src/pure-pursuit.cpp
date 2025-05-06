@@ -1,22 +1,35 @@
-/*#include "vex.h"
+#include "vex.h"
 
 double path[] = {1, 2, 3, 4, 5, true};
+double lookahedDistance = 0;
 
-int len() {
+int len(double param[]) {
     int length = 0;
-    while (path[length + 1] != true) {
+    while (param[length + 1] != true) {
         length += 1;
     }
     return length;
 }
 
-int purePursuitPath() {
+void purePursuitPath(double desiredValue[]) {
     while (true) {
-        error = desiredValue - frontTracking.position(turns) * (wheelRad * 2) * M_PI;
-        integral += error;
-        derivative = error - prevError;
-        pwr = error * kP + integral * kI + derivative * kD;
-
-        return std::cout << len() << std::endl;
+        //double circleRange = (X - )
     }
-}*/
+}
+
+double drawCircle(double radius) {
+    double listCoords[360][2] = {};
+    int iteration = 0;
+    for (int i = 0; i < constrainAngle(360 - Inertial1.heading(deg)); i++) {
+        listCoords[iteration][1] = getDistance(X, Y, (X + lookahedDistance), Y + i);
+        listCoords[iteration][2] = getDistance(X, Y, (Y + lookahedDistance), X + i);
+        iteration ++;
+    }
+
+    for (int i = 0; i < constrainAngle(0 + Inertial1.heading(deg)); i++) {
+        listCoords[iteration][1] = getDistance(X, Y, (X + lookahedDistance), Y + i);
+        listCoords[iteration][2] = getDistance(X, Y, (Y + lookahedDistance), X + i);
+        iteration ++;
+    }
+    return listCoords[360][2];
+}

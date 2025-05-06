@@ -68,7 +68,7 @@ void autonomous(void) {
         //turnToHeading(0);
 
         //driveIn(24);
-        //turnToHeading(90);
+        //turnToHeading(180);
         //wait (1, sec);
         //driveIn(-24);
         //turnToHeading(0);
@@ -78,6 +78,11 @@ void autonomous(void) {
         //driveToPosition(0, 0, reverse);
         //wait (1, sec);
         //driveToPosition(24, 24, fwd);
+        
+        //slowDrive(-24);
+        //wait (2, sec);
+        //slowDrive(24);
+
         Red_5_Ring();
     }
 }

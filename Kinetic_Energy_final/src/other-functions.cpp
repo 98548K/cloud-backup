@@ -1,5 +1,7 @@
 #include "vex.h"
 
+//Coding motivation here: https://www.youtube.com/watch?v=ruAlvlacEuM
+
 int colorSortRed() {
     while (true) {
         red_detected();
@@ -44,3 +46,4 @@ void red_detected() {
         colorSort.set(true);
    }
 }
+

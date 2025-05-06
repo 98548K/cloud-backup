@@ -2,9 +2,9 @@
 
 //Tuning constants. Depending on the tracking wheel mounting we will probably need to change the operators
 //Horizontal distance from the side of the forward/backward tracking wheel to center
-const double horizontalTrackingCenter = -2.0;
+const double horizontalTrackingCenter = 2.0;
 //Vertical distance from the side of the left/right tracking wheel to center
-const double verticalTrackingCenter = -2.25;
+const double verticalTrackingCenter = 2.25;
 
 //Tracking wheel measurments in inches
 double FRONT_WHEEL;
@@ -79,8 +79,9 @@ int positionTracking() {
             YCalculation = deltaFRONT_WHEEL;
         } 
         else {
+            //Depending on the tracking wheel placement, the tracking distances may need to be changed. It's basically just adding or subtracting from the tracking positions on the grid
             XCalculation = 2 * sin(deltaRadianHeading / 2.0) * ((deltaSIDE_WHEEL / deltaRadianHeading) + horizontalTrackingCenter);
-            YCalculation = 2 * sin(deltaRadianHeading / 2.0) * ((deltaFRONT_WHEEL / deltaRadianHeading) - verticalTrackingCenter); 
+            YCalculation = 2 * sin(deltaRadianHeading / 2.0) * ((deltaFRONT_WHEEL / deltaRadianHeading) + verticalTrackingCenter); 
         }
 
         deltaX = (YCalculation * sin(averageRadianHeading)) + (XCalculation * cos(averageRadianHeading));
@@ -150,5 +151,14 @@ void driveToPosition(double x, double y, vex::directionType dir) {
     }
     if (dir == reverse) {
         driveInOdom(-getDistance(X, Y, x, y));
+    }
+}
+
+void slowDriveToPosition(double x, double y, vex::directionType dir) {
+    if (dir == fwd) {
+        slowDriveOdom(getDistance(X, Y, x, y));
+    }
+    if (dir == reverse) {
+        slowDriveOdom(-getDistance(X, Y, x, y));
     }
 }
