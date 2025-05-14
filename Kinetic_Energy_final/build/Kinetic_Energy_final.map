@@ -119,7 +119,7 @@ Discarded input sections
  .ARM.exidx.text._Z15purePursuitPathPd
                 0x00000000        0x8 build/src/pure-pursuit.o
  .text._Z10drawCircled
-                0x00000000      0x1f8 build/src/pure-pursuit.o
+                0x00000000      0x250 build/src/pure-pursuit.o
  .ARM.exidx.text._Z10drawCircled
                 0x00000000        0x8 build/src/pure-pursuit.o
  .data.path     0x00000000       0x30 build/src/pure-pursuit.o
